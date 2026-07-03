@@ -26,8 +26,9 @@ lsof -ti "tcp:${PORT}" 2>/dev/null | xargs kill -9 2>/dev/null
 
 export QI_FAKE_PORT="${PORT}"
 export QI_LLM_KEY="dummy"                       # harness 要个非空 key
-# 脚本：round1 调查天气工具，round2 给最终答复（注意别含 | 或换行）
-export QI_FAKE_SCRIPT=$'工具|查天气|{"city":"Tokyo"}\n文本|东京现在18度，晴。'
+# 脚本：round1 调查天气工具，round2 给最终答复（注意别含 | 或换行）；
+# round3「回显」给 记忆注入_集成测（假模型_集成测 恰好消费前 2 回合，按文件名序先跑）。
+export QI_FAKE_SCRIPT=$'工具|查天气|{"city":"Tokyo"}\n文本|东京现在18度，晴。\n回显|'
 
 echo "▶ 编译并启动 假模型服务器（127.0.0.1:${PORT}）"
 "$QI_BIN" compile 工具/假模型服务器.qi -o "$TMP/server" >/dev/null 2>"$TMP/err" || {
